@@ -1,5 +1,6 @@
 import copy
 from multiprocessing import Array
+import random
 
 import pytest
 
@@ -40,11 +41,15 @@ def test_merge_sort(array, expected):
     assert _merge_sort(array) == expected
 
 
-@pytest.mark.timeout(3)
-def test_merge_sort_time_limited():
-    array = [i for i in range(10 ** 6)]
-    array.reverse()
-    assert _merge_sort(array) == [i for i in range(10 ** 7)]
+def test_parallel_merge_sort(parallel_merge_sort):
+    array = [i for i in range(100)]
+    expected = copy.deepcopy(array)
+
+    random.shuffle(array)
+
+    result = parallel_merge_sort.execute(array)
+    result = [a for a in result]
+    assert result == expected
 
 
 @pytest.mark.timeout(3)
@@ -55,9 +60,20 @@ def test_merge_time_limited():
     assert _merge_sorted_arrays(array1, array2) == sorted(array1 + array2)
 
 
-@pytest.mark.timeout(30)
-def test_parallel_merge_sort(parallel_merge_sort):
+@pytest.mark.timeout(3)
+def test_merge_sort_time_limited():
     array = [i for i in range(10 ** 6)]
-    expected = Array('i', copy.deepcopy(array))
     array.reverse()
-    assert parallel_merge_sort.execute(array) == expected
+    assert _merge_sort(array) == [i for i in range(10 ** 7)]
+
+
+@pytest.mark.timeout(30)
+def test_parallel_merge_sort_time_limited(parallel_merge_sort):
+    array = [i for i in range(10 ** 6)]
+    expected = copy.deepcopy(array)
+
+    array.reverse()
+
+    result = parallel_merge_sort.execute(array)
+    result = [a for a in result]
+    assert result == expected
