@@ -5,11 +5,14 @@ from multiprocessing import Process, Array
 from pstats import SortKey
 from typing import List
 
+from memory_profiler import profile
+
 
 class ParallelMergeSort:
     def __init__(self, cpu: int):
         self.cpu = cpu
 
+    @profile
     def execute(self, array: List[int]) -> List[int]:
         pr = cProfile.Profile()
         pr.enable()
@@ -87,23 +90,25 @@ def _merge_sort(array: List[int]):
 
 
 def _merge_sorted_arrays(array1, array2):
-    result_array = []
+    result_array = [None] * (len(array1) + len(array2))
     i, j = 0, 0
+    k = 0
 
     while i + j < len(array1) + len(array2):
         if i < len(array1) and j < len(array2):
             if array1[i] <= array2[j]:
-                result_array.append(array1[i])
+                result_array[k] = array1[i]
                 i += 1
             else:
-                result_array.append(array2[j])
+                result_array[k] = array2[j]
                 j += 1
         elif i < len(array1):
-            result_array.append(array1[i])
+            result_array[k] = array1[i]
             i += 1
         else:
-            # import pdb; pdb.set_trace()
-            result_array.append(array2[j])
+            result_array[k] = array2[j]
             j += 1
+
+        k += 1
 
     return result_array

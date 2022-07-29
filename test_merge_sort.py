@@ -1,6 +1,6 @@
 import copy
-from multiprocessing import Array
 import random
+from pstats import SortKey
 
 import pytest
 
@@ -60,14 +60,19 @@ def test_merge_time_limited():
     assert _merge_sorted_arrays(array1, array2) == sorted(array1 + array2)
 
 
-@pytest.mark.timeout(3)
+@pytest.mark.timeout(100)
 def test_merge_sort_time_limited():
     array = [i for i in range(10 ** 6)]
     array.reverse()
-    assert _merge_sort(array) == [i for i in range(10 ** 7)]
+    import cProfile
+
+    with cProfile.Profile() as pr:
+        assert _merge_sort(array) == [i for i in range(10 ** 6)]
+
+    pr.print_stats(sort=SortKey.CUMULATIVE)
 
 
-@pytest.mark.timeout(30)
+@pytest.mark.timeout(100)
 def test_parallel_merge_sort_time_limited(parallel_merge_sort):
     array = [i for i in range(10 ** 6)]
     expected = copy.deepcopy(array)
