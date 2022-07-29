@@ -37,7 +37,7 @@ class ParallelMergeSort:
                 target=_sort_in_process,
                 kwargs={
                     'array': chunks[i],
-                    'local_answer_array': answer_arrays[i]
+                    'process_chunk_answer_array': answer_arrays[i]
                 }
             )
             for i in range(self.cpu)
@@ -67,14 +67,14 @@ class ParallelMergeSort:
 
 def _sort_in_process(*,
                      array: List[int],
-                     local_answer_array: Array):
+                     process_chunk_answer_array: Array):
     if len(array) == 1:
         return
 
     sorted_array = _merge_sort(array)
 
     for i in range(len(array)):
-        local_answer_array[i] = sorted_array[i]
+        process_chunk_answer_array[i] = sorted_array[i]
 
 
 def _merge_sort(array: List[int]):
