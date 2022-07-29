@@ -78,31 +78,32 @@ def _sort_in_process(*,
 
 
 def _merge_sort(array: List[int]):
-    if len(array) <= 1:
+    array_length = len(array)
+    if array_length <= 1:
         return array
-    if len(array) == 2:
+    if array_length == 2:
         return [array[0], array[1]] if array[0] <= array[1] else [array[1], array[0]]
-    left = len(array) // 2
-    right = len(array)
-    left_half = _merge_sort(array[0:left])
-    right_half = _merge_sort(array[left:right])
+    left_half = _merge_sort(array[0:(array_length // 2)])
+    right_half = _merge_sort(array[(array_length // 2):array_length])
     return _merge_sorted_arrays(left_half, right_half)
 
 
 def _merge_sorted_arrays(array1, array2):
-    result_array = [None] * (len(array1) + len(array2))
+    first_array_length = len(array1)
+    second_array_length = len(array2)
+    result_array = [None] * (first_array_length + second_array_length)
     i, j = 0, 0
     k = 0
 
-    while i + j < len(array1) + len(array2):
-        if i < len(array1) and j < len(array2):
+    while i + j < first_array_length + second_array_length:
+        if i < first_array_length and j < second_array_length:
             if array1[i] <= array2[j]:
                 result_array[k] = array1[i]
                 i += 1
             else:
                 result_array[k] = array2[j]
                 j += 1
-        elif i < len(array1):
+        elif i < first_array_length:
             result_array[k] = array1[i]
             i += 1
         else:
