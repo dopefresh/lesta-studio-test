@@ -60,7 +60,7 @@ def test_merge_time_limited():
     assert _merge_sorted_arrays(array1, array2) == sorted(array1 + array2)
 
 
-@pytest.mark.timeout(100)
+@pytest.mark.timeout(10)
 def test_merge_sort_time_limited():
     array = [i for i in range(10 ** 6)]
     array.reverse()
@@ -74,7 +74,7 @@ def test_merge_sort_time_limited():
 
 @pytest.mark.timeout(100)
 def test_parallel_merge_sort_time_limited(parallel_merge_sort):
-    array = [i for i in range(10 ** 4)]
+    array = [i for i in range(10 ** 5)]
     expected = copy.deepcopy(array)
 
     array.reverse()
