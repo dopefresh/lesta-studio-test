@@ -74,7 +74,7 @@ def test_merge_sort_time_limited():
 
 @pytest.mark.timeout(100)
 def test_parallel_merge_sort_time_limited(parallel_merge_sort):
-    array = [i for i in range(10 ** 6)]
+    array = [i for i in range(10 ** 4)]
     expected = copy.deepcopy(array)
 
     array.reverse()

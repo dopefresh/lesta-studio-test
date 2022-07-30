@@ -14,47 +14,40 @@ class ParallelMergeSort:
 
     @profile
     def execute(self, array: List[int]) -> List[int]:
-        pr = cProfile.Profile()
-        pr.enable()
+        with cProfile.Profile() as pr:
+            chunk_step = len(array) // self.cpu
+            current = 0
+            chunks = []
+            answer_arrays = []
 
-        chunk_step = len(array) // self.cpu
-        current = 0
-        chunks = []
-        answer_arrays = []
+            for i in range(self.cpu):
+                if i != self.cpu - 1:
+                    chunks.append(array[current:current + chunk_step])
+                    answer_arrays.append(Array('i', chunk_step))
 
-        for i in range(self.cpu):
-            if i != self.cpu - 1:
-                chunks.append(array[current:current + chunk_step])
-                answer_arrays.append(Array('i', chunk_step))
+                    current += chunk_step
+                else:
+                    chunks.append(array[current:len(array)])
+                    answer_arrays.append(Array('i', len(array) - current))
 
-                current += chunk_step
-            else:
-                chunks.append(array[current:len(array)])
-                answer_arrays.append(Array('i', len(array) - current))
+            processes = [
+                Process(
+                    target=_sort_in_process,
+                    kwargs={
+                        'array': chunks[i],
+                        'process_chunk_answer_array': answer_arrays[i]
+                    }
+                )
+                for i in range(self.cpu)
+            ]
 
-        processes = [
-            Process(
-                target=_sort_in_process,
-                kwargs={
-                    'array': chunks[i],
-                    'process_chunk_answer_array': answer_arrays[i]
-                }
-            )
-            for i in range(self.cpu)
-        ]
+            for p in processes:
+                p.start()
 
-        for p in processes:
-            p.start()
+            for p in processes:
+                p.join()
 
-        for p in processes:
-            p.join()
-
-        pr.disable()
-        sortby = SortKey.CUMULATIVE
-        s = io.StringIO()
-        ps = pstats.Stats(pr, stream=s).sort_stats(sortby)
-        ps.print_stats()
-        print(s.getvalue())
+        pr.print_stats(sort=SortKey.CUMULATIVE)
 
         result_array = []
         for array in answer_arrays:
@@ -68,9 +61,6 @@ class ParallelMergeSort:
 def _sort_in_process(*,
                      array: List[int],
                      process_chunk_answer_array: Array):
-    if len(array) == 1:
-        return
-
     sorted_array = _merge_sort(array)
 
     for i in range(len(array)):
