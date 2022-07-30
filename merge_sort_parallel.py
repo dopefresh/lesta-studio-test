@@ -1,6 +1,4 @@
 import cProfile
-import io
-import pstats
 from multiprocessing import Process, Array
 from pstats import SortKey
 from typing import List
